@@ -1,6 +1,10 @@
 // Modelo de referência do Better Auth (better-auth 1.7.2).
 // Copie para o schema.prisma do sistema e acrescente no User as relações
 // inversas do domínio. O datasource precisa listar o schema "better-auth".
+datasource betterAuth {
+  provider = "postgresql"
+  schemas  = ["better-auth"]
+}
 
 model User {
   id            String    @id
