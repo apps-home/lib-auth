@@ -37,6 +37,17 @@ pnpm --filter @lib/auth build
 
 3. Schema: copie os models de `prisma/better-auth.prisma` para o `schema.prisma` do sistema (com `"better-auth"` em `schemas`) e acrescente no `User` as relações do domínio.
 
+4. **Com NestJS:** exponha o `@nestjs/*` na raiz do `node_modules`, no `pnpm-workspace.yaml` do projeto:
+
+```yaml
+publicHoistPattern:
+  - '@nestjs/*'
+```
+
+O `@lib/auth/nest` importa `@nestjs/common` e `@nestjs/core` de dentro de `packages/lib-auth`. Em desenvolvimento eles vêm dos `devDependencies` do lib, mas um `pnpm install --prod` (imagem Docker) não instala esses `devDependencies`. Sem o hoist, o serviço quebra ao subir com `Cannot find package '@nestjs/common'`. Com ele, o lib usa a cópia do serviço, que precisa ser a mesma instância (o filtro de exceções do Nest compara com `instanceof`).
+
+No Dockerfile do serviço, copie `packages/lib-auth/package.json` nos estágios de install, compile o lib antes do serviço e leve `dist`, `package.json` e `node_modules` do lib para a imagem final.
+
 ### Web (Next.js)
 
 ```ts
